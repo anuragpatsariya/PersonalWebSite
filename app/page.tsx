@@ -1,6 +1,61 @@
+"use client";
+
 import styles from "./page.module.css";
+import React, { useState, useRef, useCallback } from "react";
 
 export default function Home() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const windowRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!windowRef.current) return;
+    
+    const rect = windowRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+    setIsDragging(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+    
+    // Constrain to viewport with more reasonable bounds
+    const maxX = window.innerWidth - 400;
+    const maxY = window.innerHeight - 300;
+    
+    setPosition({
+      x: Math.max(-200, Math.min(maxX, newX)),
+      y: Math.max(-50, Math.min(maxY, newY))
+    });
+  }, [isDragging, dragOffset]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Add global mouse event listeners
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'grabbing';
+      document.body.style.userSelect = 'none';
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, handleMouseMove, handleMouseUp]);
   return (
     <div className={styles.desktop}>
       {/* Hell Background */}
@@ -46,14 +101,25 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Main Window with Perspective */}
-      <div className={styles.window + ' ' + styles.perspectiveWindow}>
-        <div className={styles.titleBar}>
+      {/* Main Window with Perspective and Draggable */}
+      <div 
+        ref={windowRef}
+        className={styles.window + ' ' + styles.perspectiveWindow + (isDragging ? ' ' + styles.dragging : '')}
+        style={{
+          left: `calc(15% + ${position.x}px)`,
+          top: `calc(8% + ${position.y}px)`,
+          transition: isDragging ? 'none' : 'all 0.3s ease'
+        }}
+      >
+        <div 
+          className={styles.titleBar + ' ' + styles.draggableTitle}
+          onMouseDown={handleMouseDown}
+        >
           <div className={styles.titleBarLeft}>
             <div className={styles.windowIcon}>💀</div>
             <span className={styles.windowTitle + ' ' + styles.glitchText} data-text="DOOM_SLAYER_ANURAG.exe - Hell on Mars">DOOM_SLAYER_ANURAG.exe - Hell on Mars</span>
           </div>
-          <div className={styles.windowControls}>
+          <div className={styles.windowControls} onMouseDown={(e) => e.stopPropagation()}>
             <button className={styles.minimizeBtn}>_</button>
             <button className={styles.maximizeBtn}>□</button>
             <button className={styles.closeBtn}>×</button>
