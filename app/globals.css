@@ -1,6 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Metal+Mania&display=swap');
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Windows XP Colors */
+  --xp-blue: #0078d4;
+  --xp-blue-light: #4cc2ff;
+  --xp-blue-dark: #005a9e;
+  --xp-green: #73aa24;
+  --xp-orange: #ff6900;
+  --xp-gray: #ece9d8;
+  --xp-gray-light: #f1f0e7;
+  --xp-gray-dark: #d4d0c8;
+  --xp-border: #0054e3;
+  
+  /* Doom Hell Colors */
+  --doom-red: #cc0000;
+  --doom-orange: #ff4500;
+  --doom-yellow: #ffaa00;
+  --doom-dark-red: #660000;
+  --doom-blood: #8b0000;
+  --doom-fire: #ff2500;
+  --doom-bg: #1a0000;
+  --doom-dark: #0d0000;
+  --doom-green: #00ff00;
+  --doom-brown: #8b4513;
+  
+  /* Effects */
+  --fire-glow: 0 0 20px var(--doom-fire), 0 0 40px var(--doom-orange), 0 0 60px var(--doom-red);
+  --hell-glow: 0 0 15px var(--doom-red), 0 0 30px var(--doom-dark-red);
 }
 
 @media (prefers-color-scheme: dark) {
